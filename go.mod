@@ -6,9 +6,9 @@ require (
 	github.com/go-logr/logr v1.2.3
 	github.com/magefile/mage v1.14.0
 	github.com/mt-sre/go-ci v0.6.1
-	github.com/onsi/ginkgo/v2 v2.4.0
+	github.com/onsi/ginkgo/v2 v2.5.0
 	github.com/onsi/gomega v1.24.0
-	github.com/operator-framework/api v0.17.1
+	github.com/operator-framework/api v0.4.1
 	github.com/prometheus/client_golang v1.13.1
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/multierr v1.8.0
@@ -23,6 +23,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/blang/semver v3.5.0+incompatible // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

@@ -2,15 +2,13 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"os/exec"
 	"time"
-
-	"k8s.io/apimachinery/pkg/api/meta"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
+	"github.com/onsi/gomega/types"
 	av1alpha1 "github.com/openshift/addon-operator/apis/addons/v1alpha1"
 	addoninstance "github.com/openshift/addon-operator/pkg/client"
 
@@ -19,7 +17,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var _ = Describe("Apply Network Policies Phase", func() {
+var _ = Describe("Status Controller", func() {
 	var (
 		ctx                  context.Context
 		cancel               context.CancelFunc
@@ -90,37 +88,36 @@ var _ = Describe("Apply Network Policies Phase", func() {
 		})
 	})
 
-	//Is addon instance available?
-	// check that there is an addonInstance in the target namespace.
-	When("Test starts", func() {
-		It("AddonInstance object should be created", func() {
-			addonInstance := addonInstanceObject(addonInstanceName, namespace)
-			_client.EventuallyObjectExists(ctx, &addonInstance, internaltesting.WithTimeout(10*time.Second))
-		})
-	})
-
 	When("Addon Instance Object Exists", func() {
 		Context("Reference Addon Status Available'", func() {
 			It("Addon Instance should report Availalbe condition", func() {
 				addonInstance := addonInstanceObject(addonInstanceName, namespace)
 				_client.EventuallyObjectExists(ctx, &addonInstance, internaltesting.WithTimeout(10*time.Second))
 
-				var conditions []metav1.Condition
-				conditions = append(conditions, addoninstance.NewAddonInstanceConditionInstalled(
+				expectedCondition := addoninstance.NewAddonInstanceConditionInstalled(
 					"True",
 					av1alpha1.AddonInstanceInstalledReasonSetupComplete,
 					"All Components Available",
-				))
-				//Expect(addonInstance.Status.Conditions).To(Equal(conditions))
-				fmt.Printf("Conditions: %v\n", conditions)
-				print(meta.IsStatusConditionTrue(addonInstance.Status.Conditions, av1alpha1.Available))
-				fmt.Printf("Other Conditions: %v\n", addonInstance.Status.Conditions)
-				//print(addonInstance.Status.Conditions[0])
-				print("RESULT HEREREEREREEEEEEE")
+				)
+
+				Eventually(func() []metav1.Condition {
+					_client.Get(ctx, &addonInstance)
+
+					return addonInstance.Status.Conditions
+				}, 10*time.Second).Should(ContainElements(EqualCondition(expectedCondition)))
 			})
 		})
 	})
 })
+
+func EqualCondition(expected metav1.Condition) types.GomegaMatcher {
+	return And(
+		HaveField("Type", expected.Type),
+		HaveField("Status", expected.Status),
+		HaveField("Reason", expected.Reason),
+		HaveField("Message", expected.Message),
+	)
+}
 
 //Tests needed
 

@@ -176,7 +176,10 @@ func initializeScheme() (*runtime.Scheme, error) {
 		return nil, fmt.Errorf("adding addon-operator v1alpha1 APIs to scheme :%w", err)
 	}
 
-	clientgoscheme.AddToScheme(scheme)
+	if err := clientgoscheme.AddToScheme(scheme); err != nil {
+		return nil, fmt.Errorf("adding client-go APIs to scheme :%w", err)
+	}
+
 	return scheme, nil
 }
 
